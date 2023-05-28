@@ -1,0 +1,53 @@
+version: '3'
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 80:8080
+    volumes:
+      - "./frontend:/app"
+    depends_on:
+      - backend
+    networks:
+      - mynetwork
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    volumes:
+      - "./backend:/app"
+    # command: sh -c "sleep 10 && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    depends_on:
+      - database
+    networks:
+      - mynetwork
+  database:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: app_turn
+      MYSQL_USER: app_turn_user
+      MYSQL_PASSWORD: root123
+    ports:
+      - 3306:3306
+    networks:
+      - mynetwork
+
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+    networks:
+      - mynetwork
+    environment:
+      ADMINER_DEFAULT_SERVER: database
+      ADMINER_DEFAULT_USERNAME: app_turn_user
+      ADMINER_DEFAULT_PASSWORD: root123
+
+networks:
+  mynetwork:

@@ -1,0 +1,49 @@
+version: '3'
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 80:8080
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - database
+
+  database:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: your_mysql_root_password
+      MYSQL_DATABASE: your_mysql_database
+      MYSQL_USER: your_mysql_user
+      MYSQL_PASSWORD: your_mysql_password
+    ports:
+      - 3306:3306
+    networks:
+      - mynetwork
+
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+    networks:
+      - mynetwork
+    environment:
+      ADMINER_DEFAULT_SERVER: database
+      ADMINER_DEFAULT_USERNAME: your_mysql_user
+      ADMINER_DEFAULT_PASSWORD: your_mysql_password
+
+networks:
+  mynetwork:
